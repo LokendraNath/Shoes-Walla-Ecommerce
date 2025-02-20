@@ -1,31 +1,102 @@
-import { BrowserRouter, Router, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Login from "./Auth/Login.jsx";
-import Home from "./Home/Home.jsx";
+import { useState } from "react";
+// Database
+import products from "./db/data.js";
+import Card from "./components/Card.jsx";
+import Reccomended from "./Recommended/Recommended";
+import Sidebar from "./SideBar/Sidebar.jsx";
+import Nav from "./Navigation/Nav.jsx";
+import Products from "./Products/Products.jsx";
 
 const App = () => {
-  const [user, setUser] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState({
+    company: null,
+    price: null,
+    color: null,
+    category: null,
+  });
 
-  useEffect(() => {
-    const loggedInUser = localStorage.getItem("shoesWallaLogged");
-    if (loggedInUser) {
-      const userData = JSON.parse(loggedInUser);
-      setUser(userData);
-    }
-  }, []);
+  const [query, setQuery] = useState("");
 
-  const handleLogin = (email, password) => {
-    if (email === "admin@example.com" && password === "123") {
-      setUser("admin");
-      localStorage.setItem("shoesWallaLogged", JSON.stringify("admin"));
-    } else {
-      alert("Invalid Credentials");
-    }
+  // ------------ Input Filter ---------------
+
+  const handleInputChange = (event) => {
+    setQuery(event.target.value);
   };
 
+  // ------------ Radio Filter ---------------
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setSelectedFilters((prevFilters) => {
+      let updatedFilters = { ...prevFilters };
+
+      if (name === "price") {
+        updatedFilters.price = value;
+      } else if (name === "colors") {
+        updatedFilters.color = value;
+      } else if (name === "category") {
+        updatedFilters.category = value;
+      }
+
+      return updatedFilters;
+    });
+  };
+
+  // ------------ Button Filter ---------------
+  const handleClick = (category) => {
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      company: category, // Specific company ko filter karo
+    }));
+  };
+
+  function filteredData(products, filters, query) {
+    let filteredProducts = products;
+
+    // **Search Filter**
+    if (query) {
+      filteredProducts = filteredProducts.filter((product) =>
+        product.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // **Apply Multiple Filters**
+    filteredProducts = filteredProducts.filter(
+      ({ category, color, company, newPrice }) => {
+        return (
+          (!filters.category || category === filters.category) &&
+          (!filters.color || color === filters.color) &&
+          (!filters.company || company === filters.company) &&
+          (!filters.price || newPrice == filters.price)
+        );
+      }
+    );
+
+    return filteredProducts.map(
+      ({ img, title, prevPrice, newPrice, discountPrice }) => (
+        <Card
+          key={Math.random()}
+          img={img}
+          title={title}
+          prevPrice={prevPrice}
+          newPrice={newPrice}
+          discountPrice={discountPrice}
+        />
+      )
+    );
+  }
+
+  const result = filteredData(products, selectedFilters, query);
   return (
     <>
-      {!user ? <Login handleLogin={handleLogin} /> : <Home setUser={setUser} />}
+      <Sidebar handleChange={handleChange} />
+      <Nav handleInputChange={handleInputChange} query={query} />
+      <Reccomended
+        handleClick={handleClick}
+        selectedCategory={selectedFilters.company}
+      />
+      <Products result={result} />
     </>
   );
 };
