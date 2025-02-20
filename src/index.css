@@ -1,1 +1,56 @@
 @import "tailwindcss";
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+/* Specific elements के लिए Montserrat */
+.font-josefin {
+  font-family: "Josefin Sans", serif;
+  font-weight: 500; /* Bold वेरिएंट के लिए */
+}
+.nav-icons {
+  @apply w-5 h-5 transition duration-300 hover:scale-[1.3];
+}
+.recommended-btn {
+  @apply border tracking-wide border-[#7a7a7a] rounded-lg py-[2px] px-2 text-sm;
+}
+.sidebar-label-container {
+  @apply mb-2 flex pl-12 relative select-none;
+}
+
+.sidebar-label-container-input {
+  @apply mr-2 absolute opacity-0 cursor-pointer;
+}
+.sidebar-label-container-span {
+  @apply absolute h-5 w-5 top-0 left-5 bg-[#eee] rounded-full;
+}
+.sidebar-label-container:hover input ~ .checkmark {
+  background-color: rgb(255, 255, 255);
+}
+.sidebar-label-container input:checked ~ .checkmark {
+  background-color: #000000;
+}
+.checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.sidebar-label-container input:checked ~ .checkmark::after {
+  display: block;
+}
+.sidebar-label-container .checkmark::after {
+  top: 6.4px;
+  left: 6.4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+.line {
+  margin-top: 3rem;
+  border-color: #f7f7f7;
+}
+/* Colors */
+.all {
+  background: linear-gradient(blue, crimson);
+}
